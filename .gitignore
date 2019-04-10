@@ -3,3 +3,9 @@
 !*/
 
 .txt
+.idea/
+
+**/strutture_dati/*.*
+**/strutture_dati/*
+!**/strutture_dati/*.h
+
