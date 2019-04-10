@@ -6,3 +6,5 @@
 *.cmake
 *.cbp
 *ake*
+*/*
+!*.h
