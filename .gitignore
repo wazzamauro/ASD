@@ -1,9 +1,4 @@
-*
-!*.h
-!*/
 
-.txt
-.idea/
 
 **/strutture_dati/*.*
 **/strutture_dati/*
