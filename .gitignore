@@ -1,6 +1,3 @@
-
-
-**/strutture_dati/*.*
-**/strutture_dati/*
-!**/strutture_dati/*.h
+*
+!*.h
 
