@@ -123,6 +123,10 @@ public:
 
     void post_print(node);
 
+    void path_from_root(node);
+
+    void path_node_to_node(node, node);
+
 
 private:
 

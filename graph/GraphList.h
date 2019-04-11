@@ -135,8 +135,7 @@ private:
     int _arches;
     int _nodes;
 
-    void findPath_util(Node, Node, Queue<Node>&);
-
+    void printAllPathsUtil(Node, Node, Node*, int &path_index);
 };
 
 template<class I, class W>
@@ -470,53 +469,49 @@ double GraphList<I, W>::meanOutDegree() {
 //implementare la procedura findPath(Node S, Node D) che stabilisce se esiste un path dal nodo S al nodo D, e in caso positivo lo stampa a video
 template<class I, class W>
 void GraphList<I, W>::findPath(Node s, Node d) {
+    bool *visited = new bool[_dimension];
+    Node *path = new Node[_dimension];
+    int path_index = 0;
 
-    if (s.getId() == d.getId()) {
-        cout << "[" << s.getId() << "]" << _matrix[s.getId()].Item << " , ";
-
-    } else {
-        Queue<Node> que;
-        findPath_util(s, d, que);
-        while (!que.empty()) {
-            cout << "[" << que.top().getId() << "]" << _matrix[que.top().getId()].Item << " , ";
-
-        }
+    for (int i = 0; i < _dimension; i++){
+        _matrix[i].visited = false;
     }
+    printAllPathsUtil(s, d, path, path_index);
+
 }
 
+
 template<class I, class W>
-void GraphList<I, W>::findPath_util(Node s, Node d, Queue<Node> &queue) {
-    bool found = false;
-    _matrix[s.getId()].visited = true;
-    queue.push(s.getId());
+void GraphList<I, W>::printAllPathsUtil(Node u, Node d, Node path[], int &path_index) {
+    _matrix[u.getId()].visited = true;
+    path[path_index] = u.getId();
+    path_index++;
 
-    while (!queue.empty() && !found) {
-        Node current = queue.top();
+    if (u.getId() == d.getId()){
+        for (int i = 0; i < path_index; i++) {
+            cout << "[" << path[i].getId() << "]" << " : " << _matrix[path[i].getId()].Item << " , ";
+        }
+        cout << endl;
+        // remove comment for only one path
+        //return;
+    } else {
 
-        ListNodes curr_neighbor = Neighbor(current);
+        ListNodes curr_neighbor = Neighbor(u);
         PositionListNodes pos = curr_neighbor.begin();
 
-        while (!curr_neighbor.end(pos)) {
-            if (d.getId() != curr_neighbor.read(pos)->getId()) {
+        while (!curr_neighbor.end(pos)){
+            Node *n = curr_neighbor.read(pos);
+            if (!_matrix[n->getId()].visited){
 
-                queue.push(s.getId());
-                findPath_util(curr_neighbor.read(pos)->getId(), d, queue);
+                printAllPathsUtil(*n, d, path, path_index);
 
-            } else {
-                queue.push(d.getId());
-                found = true;
-                break;
             }
-                pos = curr_neighbor.next(pos);
+            pos = curr_neighbor.next(pos);
         }
-        for (int j = 0; j < curr_neighbor.size(); j++) {
-            queue.pop();
-        }
-        /*
-        cout << "[" << current.getId() << "] : " << _matrix[current.getId()].Item << " , ";
-        queue.pop();
-         */
+
     }
+    path_index--;
+    _matrix[u.getId()].visited = false;
 }
 
 template<class I, class W>
