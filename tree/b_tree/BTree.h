@@ -125,10 +125,13 @@ public:
 
     void post_print(node);
 
+    void level_print(node);
+
     void path_from_root(node);
 
     void path_node_to_node(node, node);
 
+    void fill(node, T *, int, int);
 
 private:
 
@@ -493,6 +496,44 @@ void BTree<T>::post_print(node n) {
 }
 
 template<class T>
+void BTree<T>::level_print(node n) {
+    if (n == nullptr) {
+        return;
+    }
+    Queue<NodeBTree<T> *> q;
+
+    q.push(n);
+
+    while (!q.empty()) {
+        NodeBTree<T> *node = q.top();
+
+        if (node == _root) {
+            cout << "Lv 0 -> ";
+            cout << node->_item << " ";
+            cout << endl;
+            cout << "Lv " << level(node) + 1 << " -> ";
+        } else {
+            cout << node->_item << " ";
+        }
+
+        q.pop();
+
+        if (level(q.top()) > level(node)) {
+            cout << endl;
+            cout << "Lv " << level(q.top()) << " -> ";
+        }
+
+        if (node->_left != nullptr) {
+            q.push(node->_left);
+        }
+
+        if (node->_right != nullptr) {
+            q.push(node->_right);
+        }
+    }
+}
+
+template<class T>
 void BTree<T>::costr(const BTree &l, const BTree &r) {
     _root = new NodeBTree<T>;
     _root->_parent = _root;
@@ -513,7 +554,7 @@ void BTree<T>::costr(const BTree &l, const BTree &r) {
 
 template<class T>
 int BTree<T>::diametro(node n) {
-    if (n == nullptr){
+    if (n == nullptr) {
         return 0;
     }
     int depth_l = depth_from_node(n->_left);
@@ -553,33 +594,48 @@ template<class T>
 void BTree<T>::path_node_to_node(node from, node to) {
 
     node lca = prima_sotto_radice(from, to, _root);
-    Vector_list<NodeBTree<T>*> path_from;
-    Vector_list<NodeBTree<T>*> path_to;
+    Vector_list<NodeBTree<T> *> path_from;
+    Vector_list<NodeBTree<T> *> path_to;
 
 
-    while (from != lca){
+    while (from != lca) {
         path_from.push_back(from);
         from = from->_parent;
     }
 
-    while (to != lca->_parent){
+    while (to != lca->_parent) {
         path_to.push_front(to);
         to = to->_parent;
     }
 
-    while (!path_from.empty()){
+    while (!path_from.empty()) {
         cout << path_from.read(path_from.begin())->_item << " , ";
         path_from.pop_front();
     }
 
     cout << lca->_item << " , ";
 
-    while (!path_to.empty()){
+    while (!path_to.empty()) {
         cout << path_to.read(path_to.begin())->_item << " , ";
         path_to.pop_front();
     }
 
 
+}
+
+template<class T>
+void BTree<T>::fill(node n, T *a, int arrayLength, int i) {
+    if (i < arrayLength) {
+        n->_item = a[i];
+        if (2 * i + 1 < arrayLength) {
+            ins_left(n);
+            fill(n->_left, a, arrayLength, 2 * i + 1);
+        }
+        if (2 * i + 2 < arrayLength) {
+            ins_right(n);
+            fill(n->_right, a, arrayLength, 2 * i + 2);
+        }
+    }
 }
 
 template<>

@@ -8,6 +8,8 @@
 #include <string>
 #include <math.h>
 
+using namespace std;
+
 template<class T>
 class Hash {
 
@@ -31,12 +33,8 @@ template<>
 class Hash<int> {
 public:
     size_t operator()(const int key) const {
-        unsigned long hash_value = 0;
-        int length = (int) log10(key)+1;
-        string k = to_string(key);
-        for (int i = 0; i < length; i++)
-            hash_value = 5 * hash_value + k.at(i);
-        return size_t(hash_value);
+
+        return key;
     }
 };
 
