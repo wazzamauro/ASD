@@ -5,6 +5,8 @@
 #ifndef STRUTTURE_DATI_BTREE_H
 #define STRUTTURE_DATI_BTREE_H
 
+#include "../../list/vector_list.h"
+
 using namespace std;
 
 template<class T>
@@ -138,6 +140,7 @@ private:
     //support recursive function to compare from node to node (recursively)
     bool compare(node, node) const;
 
+    // lowest common ancestor of first and second node, serched from third node(eg root)
     node prima_sotto_radice(node, node, node);
 
 };
@@ -539,6 +542,44 @@ typename BTree<T>::node BTree<T>::prima_sotto_radice(node first, node second, no
             }
         }
     }
+}
+
+template<class T>
+void BTree<T>::path_from_root(node n) {
+    path_node_to_node(_root, n);
+}
+
+template<class T>
+void BTree<T>::path_node_to_node(node from, node to) {
+
+    node lca = prima_sotto_radice(from, to, _root);
+    Vector_list<NodeBTree<T>*> path_from;
+    Vector_list<NodeBTree<T>*> path_to;
+
+
+    while (from != lca){
+        path_from.push_back(from);
+        from = from->_parent;
+    }
+
+    while (to != lca->_parent){
+        path_to.push_front(to);
+        to = to->_parent;
+    }
+
+    while (!path_from.empty()){
+        cout << path_from.read(path_from.begin())->_item << " , ";
+        path_from.pop_front();
+    }
+
+    cout << lca->_item << " , ";
+
+    while (!path_to.empty()){
+        cout << path_to.read(path_to.begin())->_item << " , ";
+        path_to.pop_front();
+    }
+
+
 }
 
 template<>
