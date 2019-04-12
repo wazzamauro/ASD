@@ -18,6 +18,8 @@ class HashTable : public Dictionary<K, V> {
 
 public:
 
+    HashTable();
+
     HashTable(int);
 
     HashTable(const HashTable<K, V> &);
@@ -69,6 +71,16 @@ private:
 
 };
 
+template<class K, class V>
+HashTable<K, V>::HashTable() {
+    this->divisor = 5;
+    this->_size = 0;
+
+    this->table = new Entry<K, V> *[divisor];
+    for (int i = 0; i < divisor; i++) {
+        table[i] = NULL;
+    }
+}
 
 template<class K, class V>
 HashTable<K, V>::HashTable(int div) {
@@ -185,32 +197,6 @@ void HashTable<K, V>::insert(Entry<K, V> &e) {
     }
 }
 
-/*
-template<class K, class V>
-void HashTable<K, V>::insert(Entry<K, V> &e) {
-    int b = search(e.key);
-    if (table[b] == NULL) {
-        table[b] = new Entry<K, V>(e);
-        _size++;
-
-    } else if (table[b]->key == e.key) {
-        Entry<K, V> *temp = table[b];
-        while (temp != NULL) {
-
-            if (temp->value != e.value) {
-                temp = temp->_next;
-            } else {
-                cout << "Try to insert duplicate value" << endl << endl;
-                return;
-            }
-        }
-        temp = new Entry<K, V>(e);
-    } else {
-        cout << "Hash table is full" << endl << endl;
-        return;
-    }
-}
-*/
 template<class K, class V>
 void HashTable<K, V>::create() const {
 
@@ -259,7 +245,8 @@ Linked_list<V> HashTable<K, V>::values() {
     for (int i = 0; i < divisor; i++) {
         Entry<K, V> *temp = table[i];
         while (temp != NULL) {
-            stack_values.push_no_duplicati(temp->value);
+            //stack_values.push_no_duplicati(temp->value);
+            stack_values.push(temp->value);
             temp = temp->_next;
         }
     }
@@ -340,22 +327,5 @@ bool HashTable<K, V>::operator==(const HashTable<K, V> &e) {
     return check;
 }
 
-/*
-template<class K, class V>
-ostream &HashTable<K, V>::operator<<(ostream &os, const HashTable<K, V> &h) {
-    cout << "BuckIndex[i]: [ key, value ]" << endl;
-    for (int i = 0; i <= h.size(); i++) {
-        if (h.table[i] == NULL){
-            cout << "BuckIndex[]: [ - , - ]" << endl;
-        } else {
-            cout << "BuckIndex[" << i << "]: [ " << h.table[i]->key;
-            cout << ", ";
-            cout << h.table[i]->value << " ]" << endl;
-        }
-
-    }
-    return os;
-}
- */
 
 #endif //STRUTTURE_DATI_HASH_TABLE_H

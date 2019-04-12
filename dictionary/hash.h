@@ -33,8 +33,7 @@ template<>
 class Hash<int> {
 public:
     size_t operator()(const int key) const {
-
-        return key;
+        return key-1;
     }
 };
 
