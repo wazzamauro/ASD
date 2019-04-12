@@ -58,6 +58,9 @@ public:
 
     void resize();
 
+    K findByValue(const V &);
+
+    Linked_list<Entry<K, V> *> entries();
 
 private:
 
@@ -192,8 +195,10 @@ void HashTable<K, V>::insert(Entry<K, V> &e) {
 
     } else {
         //throw "Hash table is full";
-        cout << "Hash table is full" << endl << endl;
-        return;
+        //cout << "Hash table is full" << endl << endl;
+        resize();
+        insert(e);
+        //return;
     }
 }
 
@@ -325,6 +330,26 @@ bool HashTable<K, V>::operator==(const HashTable<K, V> &e) {
         check = true;
     }
     return check;
+}
+
+template<class K, class V>
+K HashTable<K, V>::findByValue(const V &v) {
+    for (int i = 0; i < divisor; i++) {
+        if (table[i]->value == v) {
+            return table[i]->key;
+        }
+    }
+}
+
+template<class K, class V>
+Linked_list<Entry<K, V> *> HashTable<K, V>::entries() {
+    Linked_list<Entry<K, V> *> *entries = new Linked_list<Entry<K, V> *>;
+    for (int i = 0; i < divisor; i++) {
+        if (table[i] != NULL) {
+            entries->push_back(table[i]);
+        }
+    }
+    return *entries;
 }
 
 
