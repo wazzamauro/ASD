@@ -117,6 +117,7 @@ public:
     //support recursive function to calculate how many nodes are in subtree node
     int size_from_node(node);
 
+    // diametro dell' albero
     int diametro(node);
 
     void pre_print(node);
@@ -133,6 +134,31 @@ public:
 
     void fill(node, T *, int, int);
 
+    // albero specchiato
+    //BTree<T> mirror(BTree<T> const &);
+    void mirror(BTree<T> const &);
+
+    /* Stabilisce se l’albero `e bilanciato in altezza.
+    * Un albero binario `e bilanciato in altezza se a) `e vuoto, o b) se per ogni nodo
+    * le altezze dei suoi due sottoalberi differiscono al pi`u di uno e i due sottoalberi * sono bilanciati in altezza.
+    */
+    bool is_height_balanced();
+
+    /* Stabilisce se tutti i nodi non foglia dell’albero hanno esattamente due figli */
+    bool complete_nodes();
+
+    // dato l’intero sum, determina se l’albero ha un path dalla radice ad un nodo foglia con costo pari a sum
+    bool sumPath(node, int);
+
+    // restituisce il costo del path pi`u costoso dalla radice ad un nodo foglia
+    int maxPath(node);
+
+    // print the max path
+    void printMaxSumPath(node);
+
+    // return the feaf node on the maxPath
+    node maxPathLeafNode(node);
+
 private:
 
     node _root;
@@ -146,6 +172,8 @@ private:
     // lowest common ancestor of first and second node, serched from third node(eg root)
     node prima_sotto_radice(node, node, node);
 
+    // support recursive function
+    void mirroring(node);
 };
 
 template<class T>
@@ -266,7 +294,9 @@ void BTree<T>::ins_right(node n) {
 template<class T>
 bool BTree<T>::leaf(node n) {
     if (n != nullptr) {
-        return ((n->_right == nullptr) && (n->_left == nullptr));
+        if ((n->_right == nullptr) && (n->_left == nullptr)) {
+            return true;
+        }
     }
     return false;
 }
@@ -636,6 +666,139 @@ void BTree<T>::fill(node n, T *a, int arrayLength, int i) {
             fill(n->_right, a, arrayLength, 2 * i + 2);
         }
     }
+}
+
+template<class T>
+//BTree<T> BTree<T>::mirror(const BTree<T> &t) {
+void BTree<T>::mirror(const BTree<T> &t) {
+    //BTree<T> i = t;
+    _root = new NodeBTree<T>;
+    copy(t._root, _root);
+    mirroring(_root);
+    //return i;
+}
+
+template<class T>
+void BTree<T>::mirroring(node n) {
+    if (n != nullptr) {
+        node temp;
+
+        mirroring(n->_left);
+        mirroring(n->_right);
+
+        temp = n->_left;
+        n->_left = n->_right;
+        n->_right = temp;
+    }
+}
+
+template<class T>
+bool BTree<T>::is_height_balanced() {
+    int l = depth_from_node(left(root()));
+    int r = depth_from_node(right(root()));
+    if (root() == nullptr) {
+        return true;
+    } else if (l - 1 == r || l == r || l == r - 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+template<class T>
+bool BTree<T>::complete_nodes() {
+    bool check = false;
+
+    Queue<NodeBTree<T> *> q;
+    q.push(_root);
+    while (!q.empty()) {
+        node current = q.top();
+        q.pop();
+
+        if (!leaf(current)) {
+            if (current->_left == nullptr || current->_right == nullptr) {
+                return false;
+            } else {
+                check = true;
+            }
+            q.push(current->_left);
+            q.push(current->_right);
+        }
+    }
+    return check;
+}
+
+template<class T>
+bool BTree<T>::sumPath(node n, int sum) {}
+
+template<class T>
+int BTree<T>::maxPath(node n) {}
+
+template<class T>
+void BTree<T>::printMaxSumPath(node n) {}
+
+template<class T>
+typename BTree<T>::node BTree<T>::maxPathLeafNode(BTree::node) {}
+
+
+template<>
+bool BTree<int>::sumPath(node n, int sum) {
+    if (n == nullptr) {
+        return false;
+    }
+    if (sum == n->_item) {
+        return true;
+    }
+    bool l = sumPath(n->_left, sum - n->_item);
+    bool r = sumPath(n->_right, sum - n->_item);
+    if (l || r) {
+        return true;
+    }
+    return false;
+}
+
+template<>
+int BTree<int>::maxPath(node n) {
+    if (n == nullptr) {
+        return 0;
+    }
+    int l = maxPath(n->_left);
+    int r = maxPath(n->_right);
+
+    return (max(l, r) + n->_item);
+}
+
+template<>
+typename BTree<int>::node BTree<int>::maxPathLeafNode(node n) {
+    if (n == nullptr) {
+        return nullptr;
+    }
+    node curr;
+    if (sumPath(n->_left, maxPath(n) - n->_item)) {
+        if (!leaf(n->_left)) {
+            curr = n->_left;
+        }
+    }
+    if (sumPath(n->_right, maxPath(n) - n->_item)) {
+        if (!leaf(n->_right)) {
+            curr = n->_right;
+        }
+    }
+    if(left(curr)->_item > right(curr)->_item){
+        curr = left(curr);
+    } else {
+        curr = right(curr);
+    }
+    return curr;
+}
+
+template<>
+void BTree<int>::printMaxSumPath(node n) {
+    int sum = maxPath(_root);
+    cout << "Sum of the max path is: " << sum << endl;
+    cout << "the path is: ";
+    node m = maxPathLeafNode(_root);
+    path_from_root(m);
 }
 
 template<>

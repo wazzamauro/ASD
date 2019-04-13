@@ -93,6 +93,14 @@ public:
 
     void post_print(node);
 
+    void fill();
+
+    /* Restituisce il numero di foglie presenti nell’albero n-ario T */
+    int n_leaf();
+
+    /* Restituisce il numero di nodi in T di livello k */
+    int n_level(int k);
+
 private:
 
     node _root;
@@ -467,5 +475,40 @@ void TreeList<I>::post_print(node n) {
     }
 }
 
+template<class I>
+void TreeList<I>::fill() {
+
+}
+
+template<class I>
+int TreeList<I>::n_leaf() {
+    return 0;
+}
+
+template<class I>
+int TreeList<I>::n_level(int k) {
+    return 0;
+}
+
+/*
+ ALBERONARIO T, temp;
+int i,j,k;
+scanf("%d %d",&i,&j); T=malloc(sizeof(TREENODEN)); if (T==NULL)
+printf("memoria non allocata\n"); else
+{
+T->elem=i;
+T->fratello=NULL; if (j==0)
+{
+else
+T->primofiglio=creaalbero(); temp=T->primofiglio;
+for (k=0;k<j-1;k++)
+{
+// printf("entrato nel ciclo con i pari a %d\n",i);
+temp->fratello=creaalbero();
+//printf("valore mio e del fratello %d %d\n",temp->elem, temp->fratello->elem);
+ALBERONARIO creaalbero() {
+} }
+return T; }
+ */
 
 #endif //STRUTTURE_DATI_TREELIST_H
