@@ -79,6 +79,8 @@ public:
 
     TreeList operator=(const TreeList &t);
 
+    int level(node);
+
     // La profondità di un albero ordinato è il massimo livello delle sue foglie.
     // Implementare la funzione PROFONDITA che calcola la profondità di un albero T.
     int profondita();
@@ -96,10 +98,29 @@ public:
     void fill();
 
     /* Restituisce il numero di foglie presenti nell’albero n-ario T */
-    int n_leaf();
+    int n_leaf(node);
 
     /* Restituisce il numero di nodi in T di livello k */
-    int n_level(int k);
+    int n_level(node, int);
+
+    int nodesGreaterThanX(node, int);
+
+    // max valore nell'albero
+    I maxTree(node);
+
+    //calcola il numero di nodi con k figli
+    int nodiKfigli(node, int);
+
+    // verifico se tutti gli elementi di un albero n-ario sono pari
+    bool tutti_pari(node);
+
+    // restituisce i se il valore x e' contenuto nell'albero, 0 altrimenti
+    bool findalberon(node, I);
+
+    /* verifica: ogni nodo pari ha solo figli dispari */
+    bool paridispari(node);
+
+    void mirrorTree(node);
 
 private:
 
@@ -116,6 +137,8 @@ private:
 
     // support recursive function to calculate width from node
     int width(node);
+
+    void fill_util(node);
 
 };
 
@@ -278,7 +301,7 @@ bool TreeList<I>::lastSibling(node n) const {
             return true;
         } else {
             node parent = n->_parent;
-            return (parent->_children.read(parent->_children.last()) == n);
+            return (n == parent->_children.read(parent->_children.last()));
         }
     }
     return false;
@@ -326,7 +349,7 @@ void TreeList<I>::insSubTree(node n, TreeList &t) {
 
 template<class I>
 void TreeList<I>::insFirst(node n, item el) {
-    node newnode = new TreeNodeList<I>();
+    node newnode = new TreeNodeList<I>;
     newnode->_item = el;
     newnode->_parent = n;
     n->_children.push_front(newnode);
@@ -334,7 +357,7 @@ void TreeList<I>::insFirst(node n, item el) {
 
 template<class I>
 void TreeList<I>::insNext(node n, item el) {
-    node newnode = new TreeNodeList<I>();
+    node newnode = new TreeNodeList<I>;
     node parent = n->_parent;
 
     newnode->_item = el;
@@ -373,7 +396,9 @@ void TreeList<I>::writeNode(node n, item el) {
 
 template<class I>
 typename TreeList<I>::item TreeList<I>::readNode(node n) const {
-    return n->_item;
+    if (n != nullptr) {
+        return n->_item;
+    }
 }
 
 template<class I>
@@ -477,38 +502,230 @@ void TreeList<I>::post_print(node n) {
 
 template<class I>
 void TreeList<I>::fill() {
-
+    cout << "Inserisci il valore della radice: ";
+    node curr = root();
+    I r;
+    cin >> r;
+    insRoot(r);
+    fill_util(root());
 }
 
 template<class I>
-int TreeList<I>::n_leaf() {
-    return 0;
+void TreeList<I>::fill_util(node n) {
+    node nextchild = n;
+    cout << "Vuoi inserire figli di " << readNode(n) << "?    (s/n) ";
+    char ans;
+    cin >> ans;
+    if (ans == 'n') {
+        return;
+    }
+    while (ans == 's') {
+        ans = 'x';
+        cout << "Quanti figli ha " << readNode(n) << "?";
+        int n_figli;
+        cin >> n_figli;
+        if (n_figli <= 1) {
+            cout << "Inserisci primo figlio di " << readNode(n) << ": ";
+            I p_figlio;
+            cin >> p_figlio;
+            insFirst(nextchild, p_figlio);
+        } else {
+            cout << "Inserisci primo figlio di " << readNode(n) << ": ";
+            I p_figlio;
+            cin >> p_figlio;
+            insFirst(nextchild, p_figlio);
+            nextchild = firstChild(nextchild);
+            for (int i = 0; i < n_figli - 1; i++) {
+                cout << "Inserisci fratello di " << p_figlio << ": ";
+                I s_fratello;
+                cin >> s_fratello;
+                p_figlio = s_fratello;
+                insNext(nextchild, s_fratello);
+                nextchild = nextSibling(nextchild);
+            }
+        }
+        position pos;
+        pos = n->_children.begin();
+        while (!n->_children.end(pos)) {
+            fill_util(n->_children.read(pos));
+            pos = n->_children.next(pos);
+        }
+    }
 }
 
 template<class I>
-int TreeList<I>::n_level(int k) {
-    return 0;
+int TreeList<I>::n_leaf(node n) {
+    int count = 0;
+    if (leaf(n)) {
+        return 1;
+    }
+    position pos = n->_children.begin();
+    while (!n->_children.end(pos)) {
+        count += n_leaf(n->_children.read(pos));
+        pos = n->_children.next(pos);
+    }
+    return count;
 }
 
-/*
- ALBERONARIO T, temp;
-int i,j,k;
-scanf("%d %d",&i,&j); T=malloc(sizeof(TREENODEN)); if (T==NULL)
-printf("memoria non allocata\n"); else
-{
-T->elem=i;
-T->fratello=NULL; if (j==0)
-{
-else
-T->primofiglio=creaalbero(); temp=T->primofiglio;
-for (k=0;k<j-1;k++)
-{
-// printf("entrato nel ciclo con i pari a %d\n",i);
-temp->fratello=creaalbero();
-//printf("valore mio e del fratello %d %d\n",temp->elem, temp->fratello->elem);
-ALBERONARIO creaalbero() {
-} }
-return T; }
- */
+template<class I>
+int TreeList<I>::n_level(node n, int k) {
+    int count = 1;
+    if (level(_root) == k - 1) {
+        return _root->_children.size();
+    }
+    if (!leaf(n)) {
+        position pos = n->_children.begin();
+        while (!n->_children.end(pos)) {
+            count = n_level(n->_children.read(pos), k);
+            if (level(n->_children.read(pos)) == k - 1) {
+                count += n->_children.size();
+            }
+            pos = n->_children.next(pos);
+        }
+    }
+    return count;
+}
+
+template<class I>
+int TreeList<I>::level(node n) {
+    if (n == _root) {
+        return 1;
+    }
+    int count = 1;
+    while (n != _root) {
+        n = n->_parent;
+        count++;
+    }
+    return count;
+}
+
+template<class I>
+I TreeList<I>::maxTree(node n) {
+    I maxI = n->_item;
+
+    position pos = n->_children.begin();
+    while (!n->_children.end(pos)) {
+        maxI = max(maxI, maxTree(n->_children.read(pos)));
+        pos = n->_children.next(pos);
+    }
+    return maxI;
+}
+
+template<class I>
+int TreeList<I>::nodiKfigli(node n, int k) {
+    int nodi = 0;
+    if (n == nullptr) {
+        return 0;
+    }
+    if (n->_children.size() == k) {
+        nodi++;
+    }
+    position pos = n->_children.begin();
+    while (!n->_children.end(pos)) {
+        nodi += nodiKfigli(n->_children.read(pos), k);
+        pos = n->_children.next(pos);
+    }
+    return nodi;
+}
+
+template<class I>
+bool TreeList<I>::tutti_pari(node n) {}
+
+template<>
+bool TreeList<int>::tutti_pari(node n) {
+    bool flag = false;
+    if (n != nullptr) {
+        if (n->_item % 2 == 0) {
+            flag = true;
+        }
+        position pos = n->_children.begin();
+        while (!n->_children.end(pos) && !(flag == false)) {
+            flag = tutti_pari(n->_children.read(pos));
+            pos = n->_children.next(pos);
+        }
+    }
+    return flag;
+}
+
+template<class I>
+bool TreeList<I>::findalberon(node n, I i) {
+    bool flag = false;
+    if (n != nullptr) {
+
+        if (n->_item == i) {
+            flag = true;
+        }
+        position pos = n->_children.begin();
+        while (!n->_children.end(pos) && !flag) {
+            flag = findalberon(n->_children.read(pos), i);
+            pos = n->_children.next(pos);
+        }
+    }
+    return flag;
+}
+
+
+template<class I>
+bool TreeList<I>::paridispari(node n) {
+    bool check = false;
+    if (n != nullptr) {
+
+        // per ogni nodo pari
+        if (n->_item % 2 == 0) {
+            position pos = n->_children.begin();
+            while (!n->_children.end(pos)) {
+
+                if (n->_children.read(pos)->_item % 2 == 1) {
+                    check = true;
+                } else {
+                    return false;
+                }
+                pos = n->_children.next(pos);
+            }
+        }
+        // per ogni nodo
+        position pos = n->_children.begin();
+        while (!n->_children.end(pos)) {
+            check = paridispari(n->_children.read(pos)) && check;
+            pos = n->_children.next(pos);
+        }
+    }
+    return check;
+}
+
+
+template<class I>
+void TreeList<I>::mirrorTree(node n) {
+    if (n == nullptr) {
+        return;
+    }
+    position pos = n->_children.begin();
+    n->_children.inverti();
+    while (!n->_children.end(pos)) {
+        mirrorTree(n->_children.read(pos));
+        pos = n->_children.next(pos);
+    }
+}
+
+template<class I>
+int TreeList<I>::nodesGreaterThanX(node n, int x) {}
+
+template<>
+int TreeList<int>::nodesGreaterThanX(node n, int x) {
+    if (n == nullptr) {
+        return 0;
+    }
+    int count = 0;
+    if (n->_item > x) {
+        count++;
+    }
+    position pos = n->_children.begin();
+    while (!n->_children.end(pos)) {
+        count += nodesGreaterThanX(n->_children.read(pos), x);
+        pos = n->_children.next(pos);
+    }
+
+    return count;
+}
 
 #endif //STRUTTURE_DATI_TREELIST_H

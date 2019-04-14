@@ -128,6 +128,8 @@ public:
 
     void DFS(const Node &) const;
 
+    void fill();
+
 private:
 
     InfoNode<I, W> *_matrix;
@@ -135,7 +137,7 @@ private:
     int _arches;
     int _nodes;
 
-    void printAllPathsUtil(Node, Node, Node*, int &path_index);
+    void printAllPathsUtil(Node, Node, Node *, int &path_index);
 };
 
 template<class I, class W>
@@ -473,7 +475,7 @@ void GraphList<I, W>::findPath(Node s, Node d) {
     Node *path = new Node[_dimension];
     int path_index = 0;
 
-    for (int i = 0; i < _dimension; i++){
+    for (int i = 0; i < _dimension; i++) {
         _matrix[i].visited = false;
     }
     printAllPathsUtil(s, d, path, path_index);
@@ -487,7 +489,7 @@ void GraphList<I, W>::printAllPathsUtil(Node u, Node d, Node path[], int &path_i
     path[path_index] = u.getId();
     path_index++;
 
-    if (u.getId() == d.getId()){
+    if (u.getId() == d.getId()) {
         for (int i = 0; i < path_index; i++) {
             cout << "[" << path[i].getId() << "]" << " : " << _matrix[path[i].getId()].Item << " , ";
         }
@@ -499,9 +501,9 @@ void GraphList<I, W>::printAllPathsUtil(Node u, Node d, Node path[], int &path_i
         ListNodes curr_neighbor = Neighbor(u);
         PositionListNodes pos = curr_neighbor.begin();
 
-        while (!curr_neighbor.end(pos)){
+        while (!curr_neighbor.end(pos)) {
             Node *n = curr_neighbor.read(pos);
-            if (!_matrix[n->getId()].visited){
+            if (!_matrix[n->getId()].visited) {
 
                 printAllPathsUtil(*n, d, path, path_index);
 
@@ -592,6 +594,44 @@ void GraphList<I, W>::DFS(const Node &start) const {
     while (!stack.empty()) {
         cout << " -[" << stack.top().getId() << "] : " << _matrix[stack.top().getId()].Item << " , ";
         stack.pop();
+    }
+}
+
+template<class I, class W>
+void GraphList<I, W>::fill() {
+
+    for (int i = 0; i < _dimension; i++) {
+        NodeG *temp = new NodeG;
+        insNode(*temp);
+        I item;
+        cout << "Inserisci valore per il nodo " << temp->getId() + 1 << ": "<< endl;
+        cin >> item;
+        writeItem(*temp, item);
+    }
+    cout << "Il grafo è stato creato" << endl;
+    print();
+    cout << endl;
+    cout << "Vuoi inserire archi ai nodi? (s/n)" << endl;
+    char ans;
+    cin >> ans;
+    if (ans == 's') {
+        for (int j = 0; j < _dimension; ++j) {
+
+            cout << "Quanti archi per il nodo " << _matrix[j].Item << " ?" << endl;
+            int arc;
+            cin >> arc;
+            for (int i = 0; i < arc; i++) {
+                cout << "Verso quale nodo punta l'arco " << i + 1 << " del nodo "<< _matrix[j].Item <<"? (inserire Id)" << endl;
+                int nodeto;
+                cin >> nodeto;
+                NodeG *to = new NodeG(nodeto);
+
+                cout << "Che peso ha questo arco? " << endl;
+                W w;
+                cin >> w;
+                insArch(j, to->getId()-1, w);
+            }
+        }
     }
 }
 

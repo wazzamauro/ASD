@@ -22,7 +22,7 @@ public:
         this->_parent = nullptr;
         this->_left = nullptr;
         this->_right = nullptr;
-    };
+    }
 
     NodeBTree<T>(const NodeBTree<T> &n) {
         this->_item = n._item;
@@ -649,7 +649,6 @@ void BTree<T>::path_node_to_node(node from, node to) {
         cout << path_to.read(path_to.begin())->_item << " , ";
         path_to.pop_front();
     }
-
 
 }
 
