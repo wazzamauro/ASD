@@ -132,7 +132,11 @@ public:
 
     void path_node_to_node(node, node);
 
-    void fill(node, T *, int, int);
+    void fill_bt(node, T *, int, int);
+
+    void fill();
+
+    void fill_util(node);
 
     // albero specchiato
     //BTree<T> mirror(BTree<T> const &);
@@ -653,16 +657,16 @@ void BTree<T>::path_node_to_node(node from, node to) {
 }
 
 template<class T>
-void BTree<T>::fill(node n, T *a, int arrayLength, int i) {
+void BTree<T>::fill_bt(node n, T *a, int arrayLength, int i) {
     if (i < arrayLength) {
         n->_item = a[i];
         if (2 * i + 1 < arrayLength) {
             ins_left(n);
-            fill(n->_left, a, arrayLength, 2 * i + 1);
+            fill_bt(n->_left, a, arrayLength, 2 * i + 1);
         }
         if (2 * i + 2 < arrayLength) {
             ins_right(n);
-            fill(n->_right, a, arrayLength, 2 * i + 2);
+            fill_bt(n->_right, a, arrayLength, 2 * i + 2);
         }
     }
 }
@@ -739,6 +743,49 @@ void BTree<T>::printMaxSumPath(node n) {}
 template<class T>
 typename BTree<T>::node BTree<T>::maxPathLeafNode(BTree::node) {}
 
+template<class T>
+void BTree<T>::fill() {
+    cout << "Inserire il valore della radice" << endl;
+    T r;
+    cin >> r;
+    ins_root(r);
+
+    NodeBTree<T> *curr = root();
+    fill_util(curr);
+
+}
+
+template<class T>
+void BTree<T>::fill_util(node n) {
+    cout << "Il nodo '" << n->_item << "' ha figlio sinistro? (s/n)" << endl;
+    char sx;
+    cin >> sx;
+    if (sx == 's') {
+        ins_left(n);
+        cout << "inserisci il valore del figlio sinistro di '" << n->_item << "'" << endl;
+        T figlio_sx;
+        cin >> figlio_sx;
+        write(n->_left, figlio_sx);
+    }
+    cout << "Il nodo '" << n->_item << "' ha figlio destro? (s/n)" << endl;
+    char dx;
+    cin >> dx;
+    if (dx == 's') {
+        ins_right(n);
+        cout << "inserisci il valore del figlio destro di '" << n->_item << "'" << endl;
+        T figlio_dx;
+        cin >> figlio_dx;
+        write(n->_right, figlio_dx);
+    }
+    if ((n->_left) != nullptr) {
+
+        fill_util(n->_left);
+    }
+    if ((n->_right) != nullptr) {
+
+        fill_util(n->_right);
+    }
+}
 
 template<>
 bool BTree<int>::sumPath(node n, int sum) {
@@ -783,7 +830,7 @@ typename BTree<int>::node BTree<int>::maxPathLeafNode(node n) {
             curr = n->_right;
         }
     }
-    if(left(curr)->_item > right(curr)->_item){
+    if (left(curr)->_item > right(curr)->_item) {
         curr = left(curr);
     } else {
         curr = right(curr);
