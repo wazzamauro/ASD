@@ -667,6 +667,8 @@ bool TreeList<I>::findalberon(node n, I i) {
 
 template<class I>
 bool TreeList<I>::paridispari(node n) {
+    // TODO
+    // not working
     bool check = false;
     if (n != nullptr) {
 
