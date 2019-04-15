@@ -163,6 +163,10 @@ public:
     // return the feaf node on the maxPath
     node maxPathLeafNode(node);
 
+    int sum_pari(node);
+
+    int sum_dispari(node);
+
 private:
 
     node _root;
@@ -785,6 +789,50 @@ void BTree<T>::fill_util(node n) {
 
         fill_util(n->_right);
     }
+}
+
+template<class T>
+int BTree<T>::sum_pari(node n) {}
+
+template<>
+int BTree<int>::sum_pari(node n) {
+    int count = 0;
+    if (n != nullptr) {
+        if (n->_item % 2 == 0) {
+            count++;
+        }
+    }
+    if (n->_left != nullptr) {
+
+        count += sum_pari(n->_left);
+    }
+    if (n->_right != nullptr) {
+
+        count += sum_pari(n->_right);
+    }
+    return count;
+}
+
+template<class T>
+int BTree<T>::sum_dispari(node n) {}
+
+template<>
+int BTree<int>::sum_dispari(node n) {
+    int count = 0;
+    if (n != nullptr) {
+        if (n->_item % 2 == 1) {
+            count++;
+        }
+    }
+    if (n->_left != nullptr) {
+
+        count += sum_pari(n->_left);
+    }
+    if (n->_right != nullptr) {
+
+        count += sum_pari(n->_right);
+    }
+    return count;
 }
 
 template<>
