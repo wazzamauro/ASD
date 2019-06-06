@@ -62,6 +62,12 @@ public:
 
     void pop_back();
 
+    void swap(Linked_list<T> &, Linked_list<T>::position *, Linked_list<T>::position *);
+
+    void ordering_desc(Linked_list<T> &);
+
+    void ordering_asc(Linked_list<T> &);
+
     // operators overloading
 
     Linked_list<T> &operator=(const Linked_list<T> &);
@@ -221,6 +227,40 @@ bool Linked_list<T>::operator==(const Linked_list<T> &l) const {
             s = this->begin()->_next;
         }
         return true;
+    }
+}
+
+template<class T>
+void Linked_list<T>::swap(Linked_list<T> &l, position *p, position *q) {
+    T temp = l.read(*p);
+    l.write(l.read(*q), *p);
+    l.write(temp, *q);
+
+}
+
+template<class T>
+void Linked_list<T>::ordering_desc(Linked_list<T> &l) {
+    position p;
+    position q;
+    for (p = l.begin(); p != l.next(l.last()); p = l.next(p)) {
+        for (q = l.begin(); q != p; q = l.next(q)) {
+            if (l.read(p) > l.read(q)) {
+                swap(l, &p, &q);
+            }
+        }
+    }
+}
+
+template<class T>
+void Linked_list<T>::ordering_asc(Linked_list<T> &l) {
+    position p;
+    position q;
+    for (p = l.begin(); p != l.next(l.last()); p = l.next(p)) {
+        for (q = p; q != l.next(l.last()); q = l.next(q)) {
+            if (l.read(p) > l.read(q)) {
+                swap(l, &p, &q);
+            }
+        }
     }
 }
 
